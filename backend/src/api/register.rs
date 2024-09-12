@@ -3,7 +3,7 @@ use sqlx::SqlitePool;
 
 use crate::{
     common::{MemberPartial, WebsitePartial},
-    models::{BlogModel, NewBlogModel},
+    models::NewBlogModel,
     MemberUuid, Result, WebsiteUuid,
 };
 
@@ -27,15 +27,15 @@ async fn post_install(
     extract::State(db): extract::State<SqlitePool>,
     extract::Json(value): extract::Json<RegisterNew>,
 ) -> Result<JsonResponse<serde_json::Value>> {
-    let mut _acq = db.acquire().await?;
+    let mut acq = db.acquire().await?;
 
-    // let _model = NewBlogModel {
-    //     external_website_id: value.website_id,
-    //     external_member_id: value.owner_id,
-    //     name: value.website.name,
-    // }
-    // .insert(&mut *acq)
-    // .await?;
+    let _model = NewBlogModel {
+        external_website_id: value.website_id,
+        external_member_id: value.owner_id,
+        name: value.website.name,
+    }
+    .insert(&mut *acq)
+    .await?;
 
     Ok(Json(WrappingResponse::okay(serde_json::json!({
         //

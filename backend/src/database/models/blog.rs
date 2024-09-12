@@ -99,8 +99,8 @@ impl BlogModel {
 #[derive(Debug, Clone, Copy, serde::Serialize, IntoPrimitive, TryFromPrimitive)]
 #[repr(u8)]
 pub enum SetupPosition {
-    None = 0,
-    Done = 1,
+    Done = 0,
+    None = 1,
 }
 
 impl FromRow<'_, ::sqlx::sqlite::SqliteRow> for SetupPosition {
