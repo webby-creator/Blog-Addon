@@ -85,10 +85,6 @@ macro_rules! create_id {
     };
 }
 
-// External Member
-create_id!(WebsiteUuid, Uuid, UuidError);
-create_id!(MemberUuid, Uuid, UuidError);
-
 create_id!(BlogId, i32, ParseIntError);
 create_id!(AuthorId, i32, ParseIntError);
 

@@ -1,9 +1,10 @@
+use addon_common::{MemberUuid, WebsiteUuid};
 use eyre::Result;
 use serde::Serialize;
 use sqlx::{FromRow, SqliteConnection};
 use uuid::Uuid;
 
-use crate::{AuthorId, MemberUuid, WebsiteUuid};
+use crate::AuthorId;
 
 pub struct NewAuthorModel {
     pub blog_id: WebsiteUuid,

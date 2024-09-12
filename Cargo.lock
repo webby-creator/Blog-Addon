@@ -9,8 +9,11 @@ dependencies = [
  "axum",
  "log",
  "serde",
+ "sqlx",
  "thiserror",
+ "time",
  "url",
+ "uuid",
 ]
 
 [[package]]

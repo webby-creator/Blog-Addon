@@ -1,33 +1,16 @@
-use addon_common::{InstallResponse, JsonResponse, WrappingResponse};
+use addon_common::{InstallResponse, JsonResponse, RegisterNewJson, WrappingResponse};
 use axum::{extract, routing::post, Json, Router};
 use sqlx::SqlitePool;
-use uuid::Uuid;
 
-use crate::{
-    common::{MemberPartial, WebsitePartial},
-    models::NewBlogModel,
-    MemberUuid, Result, WebsiteUuid,
-};
+use crate::{models::NewBlogModel, Result};
 
 pub fn routes() -> Router<SqlitePool> {
     Router::new().route("/", post(post_install))
 }
 
-#[derive(serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct RegisterNew {
-    instance_id: Uuid,
-
-    website_id: WebsiteUuid,
-    owner_id: MemberUuid,
-
-    member: MemberPartial,
-    website: WebsitePartial,
-}
-
 async fn post_install(
     extract::State(db): extract::State<SqlitePool>,
-    extract::Json(value): extract::Json<RegisterNew>,
+    extract::Json(value): extract::Json<RegisterNewJson>,
 ) -> Result<JsonResponse<InstallResponse>> {
     let mut acq = db.acquire().await?;
 

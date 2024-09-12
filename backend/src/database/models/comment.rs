@@ -1,3 +1,4 @@
+use addon_common::MemberUuid;
 use eyre::Result;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use serde::Serialize;
@@ -5,7 +6,7 @@ use sqlx::{FromRow, SqliteConnection};
 use time::OffsetDateTime;
 use uuid::Uuid;
 
-use crate::{BlogId, CommentId, MemberUuid, PostId};
+use crate::{BlogId, CommentId, PostId};
 
 pub struct NewCommentModel {
     pub blog_id: BlogId,

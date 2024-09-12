@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-addon-common = { path = "../../addon-common" }
+addon-common = { path = "../../addon-common", features = ["sqlx"] }
 
 hyper = "1.4"
 axum = { version = "0.7", features = ["multipart"] }
