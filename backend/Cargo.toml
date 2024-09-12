@@ -4,8 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# database = { path = "../database" }
-# common = { path = "../addons" }
+addon-common = { path = "../../addon-common" }
 
 hyper = "1.4"
 axum = { version = "0.7", features = ["multipart"] }

@@ -3,6 +3,17 @@
 version = 3
 
 [[package]]
+name = "addon-common"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "log",
+ "serde",
+ "thiserror",
+ "url",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.24.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -299,6 +310,7 @@ dependencies = [
 name = "blog-backend"
 version = "0.1.0"
 dependencies = [
+ "addon-common",
  "async-trait",
  "axum",
  "axum-extra",

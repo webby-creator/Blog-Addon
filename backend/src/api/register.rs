@@ -1,3 +1,4 @@
+use addon_common::{InstallResponse, JsonResponse, WrappingResponse};
 use axum::{extract, routing::post, Json, Router};
 use sqlx::SqlitePool;
 
@@ -6,8 +7,6 @@ use crate::{
     models::NewBlogModel,
     MemberUuid, Result, WebsiteUuid,
 };
-
-use super::{JsonResponse, WrappingResponse};
 
 pub fn routes() -> Router<SqlitePool> {
     Router::new().route("/", post(post_install))
@@ -26,7 +25,7 @@ struct RegisterNew {
 async fn post_install(
     extract::State(db): extract::State<SqlitePool>,
     extract::Json(value): extract::Json<RegisterNew>,
-) -> Result<JsonResponse<serde_json::Value>> {
+) -> Result<JsonResponse<InstallResponse>> {
     let mut acq = db.acquire().await?;
 
     let _model = NewBlogModel {
@@ -37,7 +36,5 @@ async fn post_install(
     .insert(&mut *acq)
     .await?;
 
-    Ok(Json(WrappingResponse::okay(serde_json::json!({
-        //
-    }))))
+    Ok(Json(WrappingResponse::okay(InstallResponse::Complete)))
 }
