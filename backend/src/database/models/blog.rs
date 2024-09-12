@@ -8,6 +8,8 @@ use uuid::Uuid;
 use crate::{BlogId, MemberUuid, WebsiteUuid};
 
 pub struct NewBlogModel {
+    pub instance_id: Uuid,
+
     pub external_website_id: WebsiteUuid,
     pub external_member_id: MemberUuid,
 
@@ -17,6 +19,8 @@ pub struct NewBlogModel {
 #[derive(FromRow, Serialize)]
 pub struct BlogModel {
     pub id: BlogId,
+
+    pub instance_id: Uuid,
 
     pub external_website_id: WebsiteUuid,
     pub external_member_id: MemberUuid,
@@ -38,8 +42,9 @@ impl NewBlogModel {
         let setup_position = SetupPosition::None;
 
         let resp = sqlx::query(
-            "INSERT INTO blog (external_website_id, external_member_id, name, setup_position, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $5)",
+            "INSERT INTO blog (instance_id, external_website_id, external_member_id, name, setup_position, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $6)",
         )
+        .bind(self.instance_id)
         .bind(self.external_website_id)
         .bind(self.external_member_id)
         .bind(&self.name)
@@ -50,6 +55,7 @@ impl NewBlogModel {
 
         Ok(BlogModel {
             id: BlogId::from(resp.last_insert_rowid() as i32),
+            instance_id: self.instance_id,
             external_website_id: self.external_website_id,
             external_member_id: self.external_member_id,
             name: self.name,
@@ -65,7 +71,7 @@ impl NewBlogModel {
 impl BlogModel {
     pub async fn find_one_by_guid(guid: Uuid, db: &mut SqliteConnection) -> Result<Option<Self>> {
         Ok(sqlx::query_as(
-            "SELECT id, external_website_id, external_member_id, name, setup_position, delete_reason, created_at, updated_at, deleted_at FROM blog WHERE guid = $1"
+            "SELECT id, instance_id, external_website_id, external_member_id, name, setup_position, delete_reason, created_at, updated_at, deleted_at FROM blog WHERE guid = $1"
         )
         .bind(guid)
         .fetch_optional(db)
@@ -74,7 +80,7 @@ impl BlogModel {
 
     pub async fn find_all(db: &mut SqliteConnection) -> Result<Vec<Self>> {
         Ok(sqlx::query_as(
-            "SELECT id, external_website_id, external_member_id, name, setup_position, delete_reason, created_at, updated_at, deleted_at FROM blog"
+            "SELECT id, instance_id, external_website_id, external_member_id, name, setup_position, delete_reason, created_at, updated_at, deleted_at FROM blog"
         )
         .fetch_all(db)
         .await?)
