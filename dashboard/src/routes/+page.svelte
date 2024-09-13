@@ -1,5 +1,12 @@
 <script lang="ts">
-    //
+    import { getOverview } from "../lib/request";
+
+    // TODO: Use a type for the response
+    let overview: unknown;
+
+    getOverview()
+        .then((v) => (overview = v))
+        .catch(console.error);
 </script>
 
 <div class="mt-3 space-y-4 max-w-[1248px] mx-auto">

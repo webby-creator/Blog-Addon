@@ -28,7 +28,8 @@ pub struct BlogModel {
 
     pub name: String,
 
-    pub setup_position: SetupPosition,
+    // TODO: SetupPosition - SQL INTEGER IS NOT EQUAL TO SQL INTEGER
+    pub setup_position: i32,
 
     pub delete_reason: Option<String>,
 
@@ -60,7 +61,7 @@ impl NewBlogModel {
             external_website_id: self.external_website_id,
             external_member_id: self.external_member_id,
             name: self.name,
-            setup_position,
+            setup_position: setup_position as u8 as i32,
             delete_reason: None,
             created_at: now,
             updated_at: now,
@@ -70,11 +71,14 @@ impl NewBlogModel {
 }
 
 impl BlogModel {
-    pub async fn find_one_by_guid(guid: Uuid, db: &mut SqliteConnection) -> Result<Option<Self>> {
+    pub async fn find_one_by_instance_id(
+        id: Uuid,
+        db: &mut SqliteConnection,
+    ) -> Result<Option<Self>> {
         Ok(sqlx::query_as(
-            "SELECT id, instance_id, external_website_id, external_member_id, name, setup_position, delete_reason, created_at, updated_at, deleted_at FROM blog WHERE guid = $1"
+            "SELECT id, instance_id, external_website_id, external_member_id, name, setup_position, delete_reason, created_at, updated_at, deleted_at FROM blog WHERE instance_id = $1"
         )
-        .bind(guid)
+        .bind(id)
         .fetch_optional(db)
         .await?)
     }
