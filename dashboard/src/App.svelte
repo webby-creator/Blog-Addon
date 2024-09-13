@@ -14,7 +14,7 @@
     let { path }: { path: string } = $props();
 
     const routes: { [path: string]: Component } = {
-        "/": rootRoute,
+        "/overview": rootRoute,
         "/analytics": analyticsRoute,
         "/categories": categoriesRoute,
         "/comments": commentsRoute,
@@ -23,7 +23,7 @@
         "/tags": tagsRoute,
     };
 
-    let Route = routes[path];
+    const Route = routes[path];
 </script>
 
 <main>
