@@ -4,8 +4,9 @@
     import Quill from "quill";
     import type { Delta } from "quill/core";
 
-    import { createPost } from "./request";
+    import { createPost, updatePost } from "./request";
 
+    export let postId: number | null = null;
     export let postTitle = "";
     export let postContents: Delta | null = null;
 
@@ -65,15 +66,24 @@
                 class="btn variant-filled rounded"
                 disabled={postTitle.trim().length === 0 || postLength === 0}
                 on:click={async () => {
-                    const resp = await createPost(
-                        postTitle,
-                        quill.getContents(),
-                    );
+                    if (postId == null) {
+                        const resp = await createPost(
+                            postTitle,
+                            quill.getContents(),
+                        );
 
-                    console.log(resp);
+                        console.log(resp);
+                    } else {
+                        const resp = await updatePost(postId, {
+                            title: postTitle,
+                            content: quill.getContents(),
+                        });
+
+                        console.log(resp);
+                    }
                 }}
             >
-                {#if postContents == null}
+                {#if postId == null}
                     Create
                 {:else}
                     Save

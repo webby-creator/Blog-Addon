@@ -69,6 +69,23 @@ impl NewPostModel {
 }
 
 impl PostModel {
+    pub async fn update(&mut self, db: &mut SqliteConnection) -> Result<u64> {
+        self.updated_at = OffsetDateTime::now_utc();
+
+        let res =
+            sqlx::query("UPDATE post SET title = $2, content = $3, slug = $4, status = $5, updated_at = $6 WHERE id = $1")
+                .bind(self.id)
+                .bind(&self.title)
+                .bind(&self.content)
+                .bind(&self.slug)
+                .bind(self.status)
+                .bind(self.updated_at)
+                .execute(db)
+                .await?;
+
+        Ok(res.rows_affected())
+    }
+
     pub async fn find_one_by_id(id: PostId, db: &mut SqliteConnection) -> Result<Option<Self>> {
         Ok(sqlx::query_as(
             "SELECT id, blog_id, title, content, slug, status, delete_reason, created_at, updated_at, deleted_at FROM post WHERE id = $1"

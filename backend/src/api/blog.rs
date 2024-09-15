@@ -129,7 +129,7 @@ async fn get_post(
 #[derive(Deserialize)]
 struct UpdatePostJson {
     title: Option<String>,
-    content: Option<String>,
+    content: Option<serde_json::Value>,
     status: Option<PostStatus>,
     slug: Option<String>,
 }
@@ -146,7 +146,7 @@ async fn update_post(
 ) -> Result<JsonResponse<serde_json::Value>> {
     let mut acq = db.acquire().await?;
 
-    let Some(blog) = BlogModel::find_one_by_instance_id(instance_id, &mut *acq).await? else {
+    let Some(_blog) = BlogModel::find_one_by_instance_id(instance_id, &mut *acq).await? else {
         return Err(eyre::eyre!("Addon not found"))?;
     };
 
@@ -154,7 +154,23 @@ async fn update_post(
         return Err(eyre::eyre!("Post not found"))?;
     };
 
-    // post
+    if let Some(title) = title {
+        post.title = title;
+    }
+
+    if let Some(content) = content {
+        post.content.0 = content;
+    }
+
+    if let Some(status) = status {
+        post.status = status as u8 as i32;
+    }
+
+    if let Some(slug) = slug {
+        post.slug = Some(slug);
+    }
+
+    post.update(&mut *acq).await?;
 
     Ok(Json(WrappingResponse::okay(serde_json::json!({
         "id": post.id,

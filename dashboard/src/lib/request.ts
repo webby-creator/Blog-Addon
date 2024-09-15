@@ -4,11 +4,11 @@ export async function getOverview(): Promise<unknown> {
     return fetchJson(compApiUrl(`/blog/${INSTANCE_UUID}/overview`), { method: 'GET' });
 }
 
-export async function getPostList(): Promise<ListResponse<BlogPostJson>> {
+export async function getPostList(): Promise<ListResponse<BlogPostSimpleJson>> {
     return fetchJson(compApiUrl(`/blog/${INSTANCE_UUID}/posts`), { method: 'GET' });
 }
 
-export async function createPost(title: string, content: Delta): Promise<{ id: string; slug: string; }> {
+export async function createPost(title: string, content: Delta): Promise<BlogPostFullJson> {
     return fetchJson(
         compApiUrl(`/blog/${INSTANCE_UUID}/post`),
         {
@@ -24,7 +24,7 @@ export async function createPost(title: string, content: Delta): Promise<{ id: s
 export async function updatePost(
     id: number,
     opts: { title?: string; content?: Delta; slug?: string; status?: number; }
-): Promise<unknown> {
+): Promise<string> {
     return fetchJson(
         compApiUrl(`/blog/${INSTANCE_UUID}/post/${id}`),
         {
@@ -39,7 +39,7 @@ export async function updatePost(
 
 export async function getPost(
     id: number
-): Promise<{ title: string; content: Delta; slug: string | null; status: number; }> {
+): Promise<BlogPostFullJson> {
     return fetchJson(
         compApiUrl(`/blog/${INSTANCE_UUID}/post/${id}`),
         { method: 'GET' }
