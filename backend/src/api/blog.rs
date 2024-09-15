@@ -93,6 +93,7 @@ async fn create_post(
         title,
         content,
         status: PostStatus::Draft,
+        post_date: None,
     }
     .insert(&mut *acq)
     .await?;

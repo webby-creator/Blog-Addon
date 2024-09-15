@@ -15,6 +15,8 @@ pub struct NewPostModel {
     pub slug: Option<String>,
 
     pub status: PostStatus,
+
+    pub post_date: Option<OffsetDateTime>,
 }
 
 #[derive(FromRow, Serialize)]
@@ -30,6 +32,8 @@ pub struct PostModel {
     // TODO: PostStatus - SQL erroring
     pub status: i32,
 
+    pub post_date: OffsetDateTime,
+
     pub delete_reason: Option<String>,
 
     pub created_at: OffsetDateTime,
@@ -40,15 +44,17 @@ pub struct PostModel {
 impl NewPostModel {
     pub async fn insert(self, db: &mut SqliteConnection) -> Result<PostModel> {
         let now = OffsetDateTime::now_utc();
+        let post_date = self.post_date.unwrap_or(now);
 
         let resp = sqlx::query(
-            "INSERT INTO post (blog_id, title, content, slug, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $6)",
+            "INSERT INTO post (blog_id, title, content, slug, status, post_date, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $7)",
         )
         .bind(self.blog_id)
         .bind(&self.title)
         .bind(Json(&self.content))
         .bind(&self.slug)
         .bind(&self.status)
+        .bind(post_date)
         .bind(now)
         .execute(db)
         .await?;
@@ -60,6 +66,7 @@ impl NewPostModel {
             content: Json(self.content),
             slug: self.slug,
             status: self.status as u8 as i32,
+            post_date,
             delete_reason: None,
             created_at: now,
             updated_at: now,
@@ -73,12 +80,13 @@ impl PostModel {
         self.updated_at = OffsetDateTime::now_utc();
 
         let res =
-            sqlx::query("UPDATE post SET title = $2, content = $3, slug = $4, status = $5, updated_at = $6 WHERE id = $1")
+            sqlx::query("UPDATE post SET title = $2, content = $3, slug = $4, status = $5, post_date = $6, updated_at = $7 WHERE id = $1")
                 .bind(self.id)
                 .bind(&self.title)
                 .bind(&self.content)
                 .bind(&self.slug)
                 .bind(self.status)
+                .bind(&self.post_date)
                 .bind(self.updated_at)
                 .execute(db)
                 .await?;
@@ -88,7 +96,7 @@ impl PostModel {
 
     pub async fn find_one_by_id(id: PostId, db: &mut SqliteConnection) -> Result<Option<Self>> {
         Ok(sqlx::query_as(
-            "SELECT id, blog_id, title, content, slug, status, delete_reason, created_at, updated_at, deleted_at FROM post WHERE id = $1"
+            "SELECT id, blog_id, title, content, slug, status, post_date, delete_reason, created_at, updated_at, deleted_at FROM post WHERE id = $1"
         )
         .bind(id)
         .fetch_optional(db)
@@ -97,7 +105,7 @@ impl PostModel {
 
     pub async fn find_by_blog_id(id: BlogId, db: &mut SqliteConnection) -> Result<Vec<Self>> {
         Ok(sqlx::query_as(
-            "SELECT id, blog_id, title, content, slug, status, delete_reason, created_at, updated_at, deleted_at FROM post WHERE blog_id = $1"
+            "SELECT id, blog_id, title, content, slug, status, post_date, delete_reason, created_at, updated_at, deleted_at FROM post WHERE blog_id = $1"
         )
         .bind(id)
         .fetch_all(db)
