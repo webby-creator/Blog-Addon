@@ -1,6 +1,49 @@
+import type { Delta } from "quill/core";
 
 export async function getOverview(): Promise<unknown> {
     return fetchJson(compApiUrl(`/blog/${INSTANCE_UUID}/overview`), { method: 'GET' });
+}
+
+export async function getPostList(): Promise<ListResponse<BlogPostJson>> {
+    return fetchJson(compApiUrl(`/blog/${INSTANCE_UUID}/posts`), { method: 'GET' });
+}
+
+export async function createPost(title: string, content: Delta): Promise<{ id: string; slug: string; }> {
+    return fetchJson(
+        compApiUrl(`/blog/${INSTANCE_UUID}/post`),
+        {
+            method: 'POST',
+            body: JSON.stringify({ title, content }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+    );
+}
+
+export async function updatePost(
+    id: number,
+    opts: { title?: string; content?: Delta; slug?: string; status?: number; }
+): Promise<unknown> {
+    return fetchJson(
+        compApiUrl(`/blog/${INSTANCE_UUID}/post/${id}`),
+        {
+            method: 'POST',
+            body: JSON.stringify(opts),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+    );
+}
+
+export async function getPost(
+    id: number
+): Promise<{ title: string; content: Delta; slug: string | null; status: number; }> {
+    return fetchJson(
+        compApiUrl(`/blog/${INSTANCE_UUID}/post/${id}`),
+        { method: 'GET' }
+    );
 }
 
 

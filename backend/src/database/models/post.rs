@@ -1,9 +1,9 @@
 use eyre::Result;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
+use regex::Regex;
 use serde::Serialize;
-use sqlx::{FromRow, SqliteConnection};
+use sqlx::{types::Json, FromRow, SqliteConnection};
 use time::OffsetDateTime;
-use uuid::Uuid;
 
 use crate::{BlogId, PostId};
 
@@ -11,8 +11,8 @@ pub struct NewPostModel {
     pub blog_id: BlogId,
 
     pub title: String,
-    pub content: String,
-    pub slug: String,
+    pub content: serde_json::Value,
+    pub slug: Option<String>,
 
     pub status: PostStatus,
 }
@@ -24,10 +24,11 @@ pub struct PostModel {
     pub blog_id: BlogId,
 
     pub title: String,
-    pub content: String,
-    pub slug: String,
+    pub content: Json<serde_json::Value>,
+    pub slug: Option<String>,
 
-    pub status: PostStatus,
+    // TODO: PostStatus - SQL erroring
+    pub status: i32,
 
     pub delete_reason: Option<String>,
 
@@ -45,7 +46,7 @@ impl NewPostModel {
         )
         .bind(self.blog_id)
         .bind(&self.title)
-        .bind(&self.content)
+        .bind(Json(&self.content))
         .bind(&self.slug)
         .bind(&self.status)
         .bind(now)
@@ -56,9 +57,9 @@ impl NewPostModel {
             id: PostId::from(resp.last_insert_rowid()),
             blog_id: self.blog_id,
             title: self.title,
-            content: self.content,
+            content: Json(self.content),
             slug: self.slug,
-            status: self.status,
+            status: self.status as u8 as i32,
             delete_reason: None,
             created_at: now,
             updated_at: now,
@@ -68,19 +69,20 @@ impl NewPostModel {
 }
 
 impl PostModel {
-    pub async fn find_one_by_guid(guid: Uuid, db: &mut SqliteConnection) -> Result<Option<Self>> {
+    pub async fn find_one_by_id(id: PostId, db: &mut SqliteConnection) -> Result<Option<Self>> {
         Ok(sqlx::query_as(
-            "SELECT id, blog_id, title, content, slug, status, delete_reason, created_at, updated_at, deleted_at FROM post WHERE guid = $1"
+            "SELECT id, blog_id, title, content, slug, status, delete_reason, created_at, updated_at, deleted_at FROM post WHERE id = $1"
         )
-        .bind(guid)
+        .bind(id)
         .fetch_optional(db)
         .await?)
     }
 
-    pub async fn find_all(db: &mut SqliteConnection) -> Result<Vec<Self>> {
+    pub async fn find_by_blog_id(id: BlogId, db: &mut SqliteConnection) -> Result<Vec<Self>> {
         Ok(sqlx::query_as(
-            "SELECT id, blog_id, title, content, slug, status, delete_reason, created_at, updated_at, deleted_at FROM post"
+            "SELECT id, blog_id, title, content, slug, status, delete_reason, created_at, updated_at, deleted_at FROM post WHERE blog_id = $1"
         )
+        .bind(id)
         .fetch_all(db)
         .await?)
     }
@@ -101,7 +103,9 @@ impl PostModel {
     }
 }
 
-#[derive(Debug, Clone, Copy, serde::Serialize, IntoPrimitive, TryFromPrimitive)]
+#[derive(
+    Debug, Clone, Copy, serde::Serialize, serde::Deserialize, IntoPrimitive, TryFromPrimitive,
+)]
 #[repr(u8)]
 pub enum PostStatus {
     Draft = 0,
@@ -139,4 +143,36 @@ impl ::sqlx::Type<::sqlx::sqlite::Sqlite> for PostStatus {
     fn type_info() -> ::sqlx::sqlite::SqliteTypeInfo {
         <i32 as ::sqlx::Type<::sqlx::sqlite::Sqlite>>::type_info()
     }
+}
+
+pub fn slugify(value: &str) -> String {
+    // trim leading/trailing white space
+    let mut value = Regex::new(r#"^\s+|\s+$"#)
+        .unwrap()
+        .replace_all(value, "")
+        .to_string();
+
+    value = value.to_lowercase();
+
+    // remove any non-alphanumeric characters
+    value = Regex::new(r#"[^a-z0-9 -]"#)
+        .unwrap()
+        .replace(&value, "")
+        .to_string();
+    // replace spaces with hyphens
+    value = Regex::new(r#"\s+"#)
+        .unwrap()
+        .replace(&value, "-")
+        .to_string();
+    // remove consecutive hyphens
+    value = Regex::new(r#"-+"#)
+        .unwrap()
+        .replace(&value, "-")
+        .to_string();
+
+    if value.len() > 30 {
+        value = value.chars().take(30).collect();
+    }
+
+    value
 }

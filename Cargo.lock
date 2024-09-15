@@ -328,6 +328,7 @@ dependencies = [
  "mime",
  "mime_guess",
  "num_enum",
+ "regex",
  "reqwest",
  "serde",
  "serde_json",

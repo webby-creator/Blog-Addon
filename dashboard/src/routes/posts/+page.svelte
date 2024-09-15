@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { getPostList } from "../../lib/request";
+
     //
 </script>
 
@@ -6,7 +8,7 @@
     <!-- TOP BAR -->
     <div class="flex w-full">
         <div class="h-fit self-center">
-            <a class="btn-icon btn-icon-sm variant-filled" href="..">
+            <a class="btn-icon btn-icon-sm variant-filled" href="./overview">
                 <svg
                     viewBox="0 0 24 24"
                     fill="currentColor"
@@ -37,44 +39,53 @@
         class="w-full rounded-lg bg-white p-3 drop-shadow-xl divide-y divide-gray-200"
     >
         <div class="pt-4 pb-2 px-2 flex space-x-5">
-            <div class="flex w-full h-[52px] items-center space-x-2">
-                <!-- TODO: Show once at least one is selected -->
-                <div class="hidden">
-                    <input type="checkbox" class="checkbox" />
-                </div>
+            {#await getPostList() then resp}
+                {#each resp.items as post}
+                    <a
+                        href="./view-post/{post.id}"
+                        class="flex w-full h-[52px] items-center space-x-2"
+                    >
+                        <!-- TODO: Show once at least one is selected -->
+                        <div class="hidden">
+                            <input type="checkbox" class="checkbox" />
+                        </div>
 
-                <!-- Optional Image -->
-                <div class="w-[60px] h-[42px]">
-                    <img
-                        class="object-cover rounded"
-                        width="60"
-                        height="42"
-                        alt="Img"
-                        src="https://placehold.co/600x400"
-                    />
-                </div>
+                        <!-- Optional Image -->
+                        <div class="w-[60px] h-[42px]">
+                            <img
+                                class="object-cover rounded"
+                                width="60"
+                                height="42"
+                                alt="Img"
+                                src="https://placehold.co/600x400"
+                            />
+                        </div>
 
-                <!-- TODO: Status: Published / Draft / Scheduled -->
+                        <!-- TODO: Status: Published / Draft / Scheduled -->
 
-                <!-- Title -->
-                <div>
-                    <p class="text-slate-800 text-lg">Test Title</p>
-                </div>
+                        <!-- Title -->
+                        <div>
+                            <p class="text-slate-800 text-lg">
+                                {post.title ?? "Unnamed"}
+                            </p>
+                        </div>
 
-                <!-- Last Update -->
-                <div>
-                    <p class="text-slate-700">Jan 01, 2022</p>
-                </div>
+                        <!-- Last Update -->
+                        <div>
+                            <p class="text-slate-700">Jan 01, 2022</p>
+                        </div>
 
-                <!-- TODO: Author -->
+                        <!-- TODO: Author -->
 
-                <!-- Dropdown Button -->
-                <div class="!ml-auto">
-                    <button class="btn-icon btn-icon-sm variant-filled">
-                        ...
-                    </button>
-                </div>
-            </div>
+                        <!-- Dropdown Button -->
+                        <div class="!ml-auto">
+                            <button class="btn-icon btn-icon-sm variant-filled">
+                                ...
+                            </button>
+                        </div>
+                    </a>
+                {/each}
+            {/await}
         </div>
     </div>
 </div>
