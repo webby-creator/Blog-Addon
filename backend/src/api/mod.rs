@@ -9,6 +9,7 @@ use tower_http::trace::TraceLayer;
 use crate::upload::register_b2;
 
 mod blog;
+mod cms;
 mod register;
 
 pub async fn serve(pool: SqlitePool) -> Result<()> {
@@ -26,6 +27,7 @@ pub async fn serve(pool: SqlitePool) -> Result<()> {
         Router::new()
             .nest("/registration", register::routes())
             .nest("/blog", blog::routes())
+            .nest("/cms", cms::routes())
             .layer(TraceLayer::new_for_http())
             .layer(Extension(uploader))
             .with_state(pool),
