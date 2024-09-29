@@ -5,7 +5,7 @@ use axum::{extract, routing::get, Json, Router};
 use sqlx::SqlitePool;
 use uuid::Uuid;
 
-use crate::{models::PostModel, BlogId, Result};
+use crate::Result;
 
 pub fn routes() -> Router<SqlitePool> {
     Router::new().route("/:instance/query", get(get_query))
@@ -13,7 +13,7 @@ pub fn routes() -> Router<SqlitePool> {
 
 async fn get_query(
     extract::Path(_inst_id): extract::Path<Uuid>,
-    extract::State(db): extract::State<SqlitePool>,
+    // extract::State(db): extract::State<SqlitePool>,
 ) -> Result<JsonListResponse<serde_json::Value>> {
     // let mut acq = db.acquire().await?;
 

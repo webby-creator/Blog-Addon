@@ -6,7 +6,7 @@ use std::{
 };
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use uuid::{Error as UuidError, Uuid};
+// use uuid::{Error as UuidError, Uuid};
 
 macro_rules! create_id {
     ($name:ident, $type_of:ident, $err:ident) => {
