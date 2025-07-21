@@ -1,15 +1,14 @@
-use addon_common::{MemberUuid, WebsiteUuid};
+use addon_common::{AddonInstanceUuid, MemberUuid, WebsiteUuid};
 use eyre::Result;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use serde::Serialize;
 use sqlx::{FromRow, SqliteConnection};
 use time::OffsetDateTime;
-use uuid::Uuid;
 
 use crate::BlogId;
 
 pub struct NewBlogModel {
-    pub instance_id: Uuid,
+    pub instance_id: AddonInstanceUuid,
 
     pub external_website_id: WebsiteUuid,
     pub external_member_id: MemberUuid,
@@ -21,7 +20,7 @@ pub struct NewBlogModel {
 pub struct BlogModel {
     pub id: BlogId,
 
-    pub instance_id: Uuid,
+    pub instance_id: AddonInstanceUuid,
 
     pub external_website_id: WebsiteUuid,
     pub external_member_id: MemberUuid,
@@ -72,7 +71,7 @@ impl NewBlogModel {
 
 impl BlogModel {
     pub async fn find_one_by_instance_id(
-        id: Uuid,
+        id: AddonInstanceUuid,
         db: &mut SqliteConnection,
     ) -> Result<Option<Self>> {
         Ok(sqlx::query_as(

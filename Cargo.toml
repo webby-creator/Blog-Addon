@@ -3,6 +3,7 @@ members = ["./backend"]
 
 
 [workspace.dependencies]
+addon-common = { path = "../addon-common", features = ["sqlx"] }
 tokio = { version = "1.39" }
 
 serde = "1.0"

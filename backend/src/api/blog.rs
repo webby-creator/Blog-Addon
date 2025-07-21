@@ -1,4 +1,6 @@
-use addon_common::{JsonListResponse, JsonResponse, ListResponse, WrappingResponse};
+use addon_common::{
+    AddonInstanceUuid, JsonListResponse, JsonResponse, ListResponse, WrappingResponse,
+};
 use axum::{
     extract,
     routing::{get, post},
@@ -6,7 +8,6 @@ use axum::{
 };
 use serde::Deserialize;
 use sqlx::SqlitePool;
-use uuid::Uuid;
 
 use crate::{
     models::{BlogModel, NewPostModel, PostModel, PostStatus},
@@ -26,7 +27,7 @@ pub fn routes() -> Router<SqlitePool> {
 }
 
 async fn get_overview(
-    extract::Path(instance_id): extract::Path<Uuid>,
+    extract::Path(instance_id): extract::Path<AddonInstanceUuid>,
     extract::State(db): extract::State<SqlitePool>,
 ) -> Result<JsonResponse<serde_json::Value>> {
     let mut acq = db.acquire().await?;
@@ -41,7 +42,7 @@ async fn get_overview(
 }
 
 async fn get_post_list(
-    extract::Path(instance_id): extract::Path<Uuid>,
+    extract::Path(instance_id): extract::Path<AddonInstanceUuid>,
     extract::State(db): extract::State<SqlitePool>,
 ) -> Result<JsonListResponse<PostModel>> {
     let mut acq = db.acquire().await?;
@@ -56,7 +57,7 @@ async fn get_post_list(
 }
 
 async fn get_analytics(
-    extract::Path(instance_id): extract::Path<Uuid>,
+    extract::Path(instance_id): extract::Path<AddonInstanceUuid>,
     extract::State(db): extract::State<SqlitePool>,
 ) -> Result<JsonResponse<serde_json::Value>> {
     let mut acq = db.acquire().await?;
@@ -77,7 +78,7 @@ struct CreatePostJson {
 }
 
 async fn create_post(
-    extract::Path(instance_id): extract::Path<Uuid>,
+    extract::Path(instance_id): extract::Path<AddonInstanceUuid>,
     extract::State(db): extract::State<SqlitePool>,
     extract::Json(CreatePostJson { title, content }): extract::Json<CreatePostJson>,
 ) -> Result<JsonResponse<serde_json::Value>> {
@@ -105,7 +106,7 @@ async fn create_post(
 }
 
 async fn get_post(
-    extract::Path((instance_id, post_id)): extract::Path<(Uuid, i64)>,
+    extract::Path((instance_id, post_id)): extract::Path<(AddonInstanceUuid, i64)>,
     extract::State(db): extract::State<SqlitePool>,
 ) -> Result<JsonResponse<serde_json::Value>> {
     let mut acq = db.acquire().await?;
@@ -136,7 +137,7 @@ struct UpdatePostJson {
 }
 
 async fn update_post(
-    extract::Path((instance_id, post_id)): extract::Path<(Uuid, i64)>,
+    extract::Path((instance_id, post_id)): extract::Path<(AddonInstanceUuid, i64)>,
     extract::State(db): extract::State<SqlitePool>,
     extract::Json(UpdatePostJson {
         title,
