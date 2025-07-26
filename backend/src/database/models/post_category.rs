@@ -17,9 +17,9 @@ impl PostCategoryModel {
         sqlx::query(
             "INSERT INTO post_category (blog_id, post_id, category_id) VALUES ($1, $2, $3)",
         )
-        .bind(&self.blog_id)
-        .bind(&self.post_id)
-        .bind(&self.category_id)
+        .bind(self.blog_id)
+        .bind(self.post_id)
+        .bind(self.category_id)
         .execute(db)
         .await?;
 

@@ -20,7 +20,7 @@ async fn post_install(
         external_member_id: value.owner_id,
         name: value.website.name,
     }
-    .insert(&mut *acq)
+    .insert(&mut acq)
     .await?;
 
     Ok(Json(WrappingResponse::okay(InstallResponse::Complete)))

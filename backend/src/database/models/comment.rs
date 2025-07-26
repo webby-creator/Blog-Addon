@@ -53,7 +53,7 @@ impl NewCommentModel {
             .bind(&self.author_name)
             .bind(&self.email)
             .bind(&self.comment)
-            .bind(&self.status)
+            .bind(self.status)
             .bind(now)
             .execute(db)
             .await?;

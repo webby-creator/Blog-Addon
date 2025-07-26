@@ -32,7 +32,7 @@ async fn get_overview(
 ) -> Result<JsonResponse<serde_json::Value>> {
     let mut acq = db.acquire().await?;
 
-    let Some(_blog) = BlogModel::find_one_by_instance_id(instance_id, &mut *acq).await? else {
+    let Some(_blog) = BlogModel::find_one_by_instance_id(instance_id, &mut acq).await? else {
         return Err(eyre::eyre!("Addon not found"))?;
     };
 
@@ -47,11 +47,11 @@ async fn get_post_list(
 ) -> Result<JsonListResponse<PostModel>> {
     let mut acq = db.acquire().await?;
 
-    let Some(blog) = BlogModel::find_one_by_instance_id(instance_id, &mut *acq).await? else {
+    let Some(blog) = BlogModel::find_one_by_instance_id(instance_id, &mut acq).await? else {
         return Err(eyre::eyre!("Addon not found"))?;
     };
 
-    let posts = PostModel::find_by_blog_id(blog.id, &mut *acq).await?;
+    let posts = PostModel::find_by_blog_id(blog.id, &mut acq).await?;
 
     Ok(Json(WrappingResponse::okay(ListResponse::all(posts))))
 }
@@ -62,7 +62,7 @@ async fn get_analytics(
 ) -> Result<JsonResponse<serde_json::Value>> {
     let mut acq = db.acquire().await?;
 
-    let Some(_blog) = BlogModel::find_one_by_instance_id(instance_id, &mut *acq).await? else {
+    let Some(_blog) = BlogModel::find_one_by_instance_id(instance_id, &mut acq).await? else {
         return Err(eyre::eyre!("Addon not found"))?;
     };
 
@@ -84,7 +84,7 @@ async fn create_post(
 ) -> Result<JsonResponse<serde_json::Value>> {
     let mut acq = db.acquire().await?;
 
-    let Some(blog) = BlogModel::find_one_by_instance_id(instance_id, &mut *acq).await? else {
+    let Some(blog) = BlogModel::find_one_by_instance_id(instance_id, &mut acq).await? else {
         return Err(eyre::eyre!("Addon not found"))?;
     };
 
@@ -96,7 +96,7 @@ async fn create_post(
         status: PostStatus::Draft,
         post_date: None,
     }
-    .insert(&mut *acq)
+    .insert(&mut acq)
     .await?;
 
     Ok(Json(WrappingResponse::okay(serde_json::json!({
@@ -111,11 +111,11 @@ async fn get_post(
 ) -> Result<JsonResponse<serde_json::Value>> {
     let mut acq = db.acquire().await?;
 
-    let Some(blog) = BlogModel::find_one_by_instance_id(instance_id, &mut *acq).await? else {
+    let Some(blog) = BlogModel::find_one_by_instance_id(instance_id, &mut acq).await? else {
         return Err(eyre::eyre!("Addon not found"))?;
     };
 
-    let Some(post) = PostModel::find_one_by_id(PostId::from(post_id), &mut *acq).await? else {
+    let Some(post) = PostModel::find_one_by_id(PostId::from(post_id), &mut acq).await? else {
         return Err(eyre::eyre!("Post not found"))?;
     };
 
@@ -148,11 +148,11 @@ async fn update_post(
 ) -> Result<JsonResponse<serde_json::Value>> {
     let mut acq = db.acquire().await?;
 
-    let Some(_blog) = BlogModel::find_one_by_instance_id(instance_id, &mut *acq).await? else {
+    let Some(_blog) = BlogModel::find_one_by_instance_id(instance_id, &mut acq).await? else {
         return Err(eyre::eyre!("Addon not found"))?;
     };
 
-    let Some(mut post) = PostModel::find_one_by_id(PostId::from(post_id), &mut *acq).await? else {
+    let Some(mut post) = PostModel::find_one_by_id(PostId::from(post_id), &mut acq).await? else {
         return Err(eyre::eyre!("Post not found"))?;
     };
 
@@ -172,7 +172,7 @@ async fn update_post(
         post.slug = Some(slug);
     }
 
-    post.update(&mut *acq).await?;
+    post.update(&mut acq).await?;
 
     Ok(Json(WrappingResponse::okay(serde_json::json!({
         "id": post.id,

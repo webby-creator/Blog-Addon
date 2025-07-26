@@ -53,7 +53,7 @@ impl NewPostModel {
         .bind(&self.title)
         .bind(Json(&self.content))
         .bind(&self.slug)
-        .bind(&self.status)
+        .bind(self.status)
         .bind(post_date)
         .bind(now)
         .execute(db)
@@ -86,7 +86,7 @@ impl PostModel {
                 .bind(&self.content)
                 .bind(&self.slug)
                 .bind(self.status)
-                .bind(&self.post_date)
+                .bind(self.post_date)
                 .bind(self.updated_at)
                 .execute(db)
                 .await?;

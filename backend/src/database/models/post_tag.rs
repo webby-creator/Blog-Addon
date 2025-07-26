@@ -15,9 +15,9 @@ pub struct PostTagModel {
 impl PostTagModel {
     pub async fn insert(self, db: &mut SqliteConnection) -> Result<PostTagModel> {
         sqlx::query("INSERT INTO post_tag (blog_id, post_id, tag_id) VALUES ($1, $2, $3)")
-            .bind(&self.blog_id)
-            .bind(&self.post_id)
-            .bind(&self.tag_id)
+            .bind(self.blog_id)
+            .bind(self.post_id)
+            .bind(self.tag_id)
             .execute(db)
             .await?;
 
