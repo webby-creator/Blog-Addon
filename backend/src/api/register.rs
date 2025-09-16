@@ -1,4 +1,4 @@
-use addon_common::{InstallResponse, JsonResponse, RegisterNewJson, WrappingResponse};
+use webby_addon_common::{InstallResponse, JsonResponse, RegisterNewJson, WrappingResponse};
 use axum::{extract, routing::post, Json, Router};
 use sqlx::SqlitePool;
 

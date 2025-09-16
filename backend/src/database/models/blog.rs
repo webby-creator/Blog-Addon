@@ -1,4 +1,4 @@
-use addon_common::{AddonInstanceUuid, MemberUuid, WebsiteUuid};
+use webby_addon_common::{AddonInstanceUuid, MemberUuid, WebsiteUuid};
 use eyre::Result;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use serde::Serialize;

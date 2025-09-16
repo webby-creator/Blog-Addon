@@ -1,4 +1,4 @@
-use addon_common::{
+use webby_addon_common::{
     AddonInstanceUuid, JsonListResponse, JsonResponse, ListResponse, WrappingResponse,
 };
 use axum::{

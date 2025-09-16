@@ -1,4 +1,4 @@
-use addon_common::{MemberUuid, WebsiteUuid};
+use webby_addon_common::{MemberUuid, WebsiteUuid};
 use eyre::Result;
 use serde::Serialize;
 use sqlx::{FromRow, SqliteConnection};
